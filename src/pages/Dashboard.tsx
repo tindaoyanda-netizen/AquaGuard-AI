@@ -3,6 +3,7 @@ import RainEffect from '@/components/RainEffect';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 import LeftSidebar from '@/components/dashboard/LeftSidebar';
 import EnhancedKenyaMap from '@/components/dashboard/EnhancedKenyaMap';
 import RightDetailsPanel from '@/components/dashboard/RightDetailsPanel';
@@ -12,8 +13,9 @@ import DemoReportForm from '@/components/reporting/DemoReportForm';
 import ReportMarkers from '@/components/reporting/ReportMarkers';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import MyReports from '@/components/reporting/MyReports';
+import AlertThresholds from '@/components/dashboard/AlertThresholds';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Shield, Plus, FileText, Menu, Beaker } from 'lucide-react';
+import { AlertTriangle, Shield, Plus, FileText, Menu, Beaker, Bell } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeReports } from '@/hooks/useRealtimeReports';
 import { useResidentNotifications } from '@/hooks/useResidentNotifications';
@@ -60,6 +62,8 @@ const Dashboard = () => {
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showMyReports, setShowMyReports] = useState(false);
   const [showDemoForm, setShowDemoForm] = useState(false);
+  const [showAlertThresholds, setShowAlertThresholds] = useState(false);
+  const [dashboardReady, setDashboardReady] = useState(false);
   const nationalStats = getNationalStats();
 
   // Auto-collapse sidebar on mobile
@@ -71,6 +75,12 @@ const Dashboard = () => {
       setSidebarCollapsed(false);
     }
   }, [isMobile]);
+
+  // Simulate initial data loading
+  useEffect(() => {
+    const timer = setTimeout(() => setDashboardReady(true), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (profile?.county_id) {
@@ -153,6 +163,10 @@ const Dashboard = () => {
     userId: user?.id || null,
     enabled: !!user && !isCountyAdmin,
   });
+
+  if (!dashboardReady) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -303,6 +317,16 @@ const Dashboard = () => {
                 </Button>
               </>
             )}
+            {/* Alert Thresholds */}
+            <Button
+              onClick={() => setShowAlertThresholds(true)}
+              variant="outline"
+              className="gap-2"
+              size={isMobile ? "sm" : "default"}
+            >
+              <Bell className="w-4 h-4" />
+              Alerts
+            </Button>
           </div>
           
           {/* Map Section */}
@@ -377,6 +401,12 @@ const Dashboard = () => {
         isOpen={showDemoForm}
         onClose={() => setShowDemoForm(false)}
         demoCountyId={selectedCounty?.id || 'kakamega'}
+      />
+
+      {/* Alert Thresholds */}
+      <AlertThresholds
+        isOpen={showAlertThresholds}
+        onClose={() => setShowAlertThresholds(false)}
       />
     </div>
   );

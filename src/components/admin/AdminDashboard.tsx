@@ -31,6 +31,9 @@ interface EnvironmentalReport {
   report_type: 'flooded_road' | 'dry_borehole' | 'broken_kiosk' | 'overflowing_river';
   county_id: string;
   town_name: string | null;
+  sub_location: string | null;
+  road_name: string | null;
+  landmark: string | null;
   latitude: number;
   longitude: number;
   description: string | null;

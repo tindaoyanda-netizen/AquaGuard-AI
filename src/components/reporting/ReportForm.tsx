@@ -392,42 +392,54 @@ const ReportForm = ({ isOpen, onClose, userLocation, userCountyId, onReportSubmi
                     )}
                   </div>
 
-                  {/* Image Upload */}
+                  {/* Image Upload / Camera Capture */}
                   <div className="space-y-2">
                     <Label>Photo Evidence (Optional)</Label>
-                    <div className="relative">
-                      {imagePreview ? (
-                        <div className="relative rounded-xl overflow-hidden">
-                          <img
-                            src={imagePreview}
-                            alt="Preview"
-                            className="w-full h-40 object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setImageFile(null);
-                              setImagePreview(null);
-                            }}
-                            className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-lg hover:bg-black/70"
-                          >
-                            <X className="w-4 h-4 text-white" />
-                          </button>
+                    <canvas ref={canvasRef} className="hidden" />
+                    
+                    {isCameraOpen ? (
+                      <div className="relative rounded-xl overflow-hidden bg-black">
+                        <video ref={videoRef} autoPlay playsInline muted className="w-full h-48 object-cover" />
+                        <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-3">
+                          <Button type="button" size="sm" variant="destructive" onClick={closeCamera} className="rounded-full">
+                            <X className="w-4 h-4 mr-1" /> Cancel
+                          </Button>
+                          <Button type="button" size="lg" onClick={capturePhoto} className="rounded-full w-14 h-14 bg-white hover:bg-white/90 border-4 border-primary p-0">
+                            <div className="w-10 h-10 rounded-full bg-primary" />
+                          </Button>
                         </div>
-                      ) : (
-                        <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors">
-                          <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                          <span className="text-sm text-muted-foreground">Click to upload image</span>
-                          <span className="text-xs text-muted-foreground">Max 5MB</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                          />
+                      </div>
+                    ) : imagePreview ? (
+                      <div className="relative rounded-xl overflow-hidden">
+                        <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => { setImageFile(null); setImagePreview(null); }}
+                          className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-lg hover:bg-black/70"
+                        >
+                          <X className="w-4 h-4 text-white" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex flex-col items-center justify-center h-28 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-muted/50"
+                          onClick={openCamera}
+                        >
+                          <Camera className="w-7 h-7 text-primary mb-1.5" />
+                          <span className="text-xs font-medium text-foreground">Capture Live</span>
+                          <span className="text-[10px] text-muted-foreground">Use camera</span>
+                        </Button>
+                        <label className="flex flex-col items-center justify-center h-28 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors">
+                          <Upload className="w-7 h-7 text-muted-foreground mb-1.5" />
+                          <span className="text-xs font-medium text-foreground">Upload Photo</span>
+                          <span className="text-[10px] text-muted-foreground">Max 5MB</span>
+                          <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                         </label>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* AI Notice */}

@@ -17,6 +17,9 @@ const HeroSection = () => {
       {/* Deep Ocean Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-water-dark/90 via-secondary/80 to-water-dark/95" />
       
+      {/* Rain */}
+      <RainEffect dropCount={70} className="z-[1]" />
+      
       {/* Animated wave layers */}
       <div className="absolute bottom-0 left-0 right-0 z-10 overflow-hidden h-24">
         <svg className="absolute bottom-0 w-[200%] h-full animate-wave" viewBox="0 0 1440 60" preserveAspectRatio="none">

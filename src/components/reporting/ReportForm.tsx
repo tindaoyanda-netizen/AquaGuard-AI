@@ -127,12 +127,15 @@ const ReportForm = ({ isOpen, onClose, userLocation, userCountyId, onReportSubmi
           report_type: data.reportType,
           county_id: userCountyId,
           town_name: data.townName || null,
+          sub_location: data.subLocation || null,
+          road_name: data.roadName || null,
+          landmark: data.landmark || null,
           latitude: userLocation.lat,
           longitude: userLocation.lng,
           description: data.description || null,
           image_url: imageUrl,
           status: 'pending',
-        })
+        } as any)
         .select()
         .single();
 

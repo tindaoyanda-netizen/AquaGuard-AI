@@ -7,11 +7,12 @@ import EnhancedKenyaMap from '@/components/dashboard/EnhancedKenyaMap';
 import RightDetailsPanel from '@/components/dashboard/RightDetailsPanel';
 import NotificationsPanel from '@/components/dashboard/NotificationsPanel';
 import ReportForm from '@/components/reporting/ReportForm';
+import DemoReportForm from '@/components/reporting/DemoReportForm';
 import ReportMarkers from '@/components/reporting/ReportMarkers';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import MyReports from '@/components/reporting/MyReports';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Shield, Plus, FileText, Menu } from 'lucide-react';
+import { AlertTriangle, Shield, Plus, FileText, Menu, Beaker } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeReports } from '@/hooks/useRealtimeReports';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -56,7 +57,7 @@ const Dashboard = () => {
   const [showReportForm, setShowReportForm] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showMyReports, setShowMyReports] = useState(false);
-  
+  const [showDemoForm, setShowDemoForm] = useState(false);
   const nationalStats = getNationalStats();
 
   // Auto-collapse sidebar on mobile
@@ -271,15 +272,26 @@ const Dashboard = () => {
             )}
             
             {!user && (
-              <Button
-                onClick={() => navigate('/auth')}
-                variant="outline"
-                className="gap-2"
-                size={isMobile ? "sm" : "default"}
-              >
-                <AlertTriangle className="w-4 h-4" />
-                Sign in to submit reports
-              </Button>
+              <>
+                <Button
+                  onClick={() => setShowDemoForm(true)}
+                  className="gap-2"
+                  variant="hero"
+                  size={isMobile ? "sm" : "default"}
+                >
+                  <Beaker className="w-4 h-4" />
+                  Try Demo Report
+                </Button>
+                <Button
+                  onClick={() => navigate('/auth')}
+                  variant="outline"
+                  className="gap-2"
+                  size={isMobile ? "sm" : "default"}
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  Sign in to submit reports
+                </Button>
+              </>
             )}
           </div>
           
@@ -348,6 +360,13 @@ const Dashboard = () => {
           onClose={() => setShowMyReports(false)}
         />
       )}
+
+      {/* Demo Report Form */}
+      <DemoReportForm
+        isOpen={showDemoForm}
+        onClose={() => setShowDemoForm(false)}
+        demoCountyId={selectedCounty?.id || 'kakamega'}
+      />
     </div>
   );
 };

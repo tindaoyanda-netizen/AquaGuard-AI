@@ -147,6 +147,12 @@ const Dashboard = () => {
     onNewReport: handleReportSubmitted,
   });
 
+  // Resident notifications for admin replies and status changes
+  const { unreadCount: residentUnread } = useResidentNotifications({
+    userId: user?.id || null,
+    enabled: !!user && !isCountyAdmin,
+  });
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}

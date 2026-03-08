@@ -283,20 +283,53 @@ const ReportForm = ({ isOpen, onClose, userLocation, userCountyId, onReportSubmi
 
                   {/* Town Name */}
                   <div className="space-y-2">
-                    <Label htmlFor="townName">Town/Area Name (Optional)</Label>
+                    <Label htmlFor="townName">Town/Area Name *</Label>
                     <Input
                       id="townName"
-                      placeholder="e.g., Westlands, Kibera"
+                      placeholder="e.g., Westlands, Kibera, Bondo Town"
                       {...register('townName')}
+                    />
+                    {errors.townName && (
+                      <p className="text-sm text-destructive">{errors.townName.message}</p>
+                    )}
+                  </div>
+
+                  {/* Sub-location */}
+                  <div className="space-y-2">
+                    <Label htmlFor="subLocation">Sub-location / Ward</Label>
+                    <Input
+                      id="subLocation"
+                      placeholder="e.g., South B Ward, Usonga Sub-location"
+                      {...register('subLocation')}
+                    />
+                  </div>
+
+                  {/* Road Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="roadName">Road / Street Name</Label>
+                    <Input
+                      id="roadName"
+                      placeholder="e.g., Mombasa Road, near junction of..."
+                      {...register('roadName')}
+                    />
+                  </div>
+
+                  {/* Landmark */}
+                  <div className="space-y-2">
+                    <Label htmlFor="landmark">Nearest Landmark</Label>
+                    <Input
+                      id="landmark"
+                      placeholder="e.g., opposite Tuskys, near Bondo Primary School"
+                      {...register('landmark')}
                     />
                   </div>
 
                   {/* Description */}
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description (Optional)</Label>
+                    <Label htmlFor="description">Additional Details</Label>
                     <Textarea
                       id="description"
-                      placeholder="Provide additional details about the situation..."
+                      placeholder="Describe the situation: how severe is it, how many people affected, any urgent needs..."
                       className="min-h-[100px]"
                       {...register('description')}
                     />

@@ -355,7 +355,7 @@ const AdminDashboard = ({ isOpen, onClose, userCountyId }: AdminDashboardProps) 
                               {reportTypeLabels[report.report_type]?.label}
                             </h3>
                             <p className="text-sm text-muted-foreground">
-                              {report.town_name || 'Unknown area'}
+                              {[report.town_name, report.sub_location, report.landmark].filter(Boolean).join(' • ') || 'Unknown area'}
                             </p>
                             <div className="flex items-center gap-2 mt-1">
                               <Badge

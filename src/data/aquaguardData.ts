@@ -744,72 +744,98 @@ export const kenyaCounties: CountyData[] = [
   },
 ];
 
-// Generate sample notifications
+// Generate data-driven notifications from actual county metrics
 export const generateNotifications = (userCountyId?: string): Notification[] => {
   const now = new Date();
-  const notifications: Notification[] = [
-    {
-      id: 'notif-1',
-      type: 'flood_alert',
-      severity: 'critical',
-      title: 'Flood Warning: Kakamega',
-      message: 'Heavy rainfall expected. Flood risk HIGH in Budalangi and Mumias. Evacuate low-lying areas immediately.',
-      countyId: 'kakamega',
-      timestamp: new Date(now.getTime() - 30 * 60000),
-      read: false,
-    },
-    {
-      id: 'notif-2',
-      type: 'flood_alert',
-      severity: 'warning',
-      title: 'Flood Watch: Mombasa',
-      message: 'Coastal flooding possible in Likoni and Kisauni within 24 hours. Move valuables to higher ground.',
-      countyId: 'mombasa',
-      timestamp: new Date(now.getTime() - 2 * 3600000),
-      read: false,
-    },
-    {
-      id: 'notif-3',
-      type: 'water_scarcity',
-      severity: 'critical',
-      title: 'Severe Water Shortage: Turkana',
-      message: 'Water availability at 22%. Boreholes running low. Ration water usage and seek alternative sources.',
-      countyId: 'turkana',
-      timestamp: new Date(now.getTime() - 4 * 3600000),
-      read: false,
-    },
-    {
-      id: 'notif-4',
-      type: 'weather_alert',
-      severity: 'warning',
-      title: 'Heavy Rain: Nairobi',
-      message: 'Expect 15mm rainfall tomorrow. Flash floods possible in Mathare and Kibera. Clear drainage channels.',
-      countyId: 'nairobi',
-      timestamp: new Date(now.getTime() - 6 * 3600000),
-      read: true,
-    },
-    {
-      id: 'notif-5',
-      type: 'daily_insight',
-      severity: 'info',
-      title: 'Daily Water Report',
-      message: 'National water availability stable at 52%. 6 counties under severe stress. 3 flood warnings active.',
-      countyId: 'national',
-      timestamp: new Date(now.getTime() - 12 * 3600000),
-      read: true,
-    },
-  ];
+  const notifications: Notification[] = [];
+  let notifIndex = 0;
 
-  // Add user-specific notification if location detected
+  // 1. Critical flood alerts — counties with high/critical flood risk AND heavy rainfall
+  kenyaCounties
+    .filter(c => (c.floodRisk.riskLevel === 'high' || c.floodRisk.riskLevel === 'critical') && c.weather.rainfall24h >= 25)
+    .sort((a, b) => b.floodRisk.probability - a.floodRisk.probability)
+    .slice(0, 3)
+    .forEach(c => {
+      notifications.push({
+        id: `notif-flood-${notifIndex++}`,
+        type: 'flood_alert',
+        severity: c.floodRisk.riskLevel === 'critical' ? 'critical' : 'warning',
+        title: `Flood ${c.floodRisk.riskLevel === 'critical' ? 'Warning' : 'Watch'}: ${c.name}`,
+        message: `${c.weather.rainfall24h}mm rainfall recorded in 24h (${c.weather.rainfall24h >= 50 ? 'heavy' : 'moderate'}). ${c.floodRisk.probability}% flood probability. Affected areas: ${c.floodRisk.affectedAreas.slice(0, 3).join(', ')}. ${c.floodRisk.precautions[0] || 'Take precautions.'}`,
+        countyId: c.id,
+        timestamp: new Date(now.getTime() - notifIndex * 45 * 60000),
+        read: false,
+      });
+    });
+
+  // 2. Severe water scarcity — counties with water availability < 30% or stress > 85
+  kenyaCounties
+    .filter(c => c.waterAvailability < 30 || c.waterStress > 85)
+    .sort((a, b) => a.waterAvailability - b.waterAvailability)
+    .slice(0, 3)
+    .forEach(c => {
+      notifications.push({
+        id: `notif-water-${notifIndex++}`,
+        type: 'water_scarcity',
+        severity: c.waterAvailability < 25 ? 'critical' : 'warning',
+        title: `Water ${c.waterAvailability < 25 ? 'Crisis' : 'Shortage'}: ${c.name}`,
+        message: `Water availability at ${c.waterAvailability}%, stress level ${c.waterStress}/100. Recent rainfall: ${c.recentRainfall}mm. ${c.waterSources.boreholes} boreholes serving ${(c.population / 1000).toFixed(0)}K people. Ration water and seek alternative sources.`,
+        countyId: c.id,
+        timestamp: new Date(now.getTime() - notifIndex * 60 * 60000),
+        read: false,
+      });
+    });
+
+  // 3. Weather alerts — counties expecting heavy rain in forecast
+  kenyaCounties
+    .filter(c => c.weather.forecast.some(f => f.condition === 'heavy_rain' || f.condition === 'storm'))
+    .slice(0, 2)
+    .forEach(c => {
+      const heavyDay = c.weather.forecast.find(f => f.condition === 'heavy_rain' || f.condition === 'storm');
+      if (heavyDay) {
+        notifications.push({
+          id: `notif-weather-${notifIndex++}`,
+          type: 'weather_alert',
+          severity: heavyDay.condition === 'storm' ? 'critical' : 'warning',
+          title: `${heavyDay.condition === 'storm' ? 'Storm' : 'Heavy Rain'} Alert: ${c.name}`,
+          message: `${heavyDay.rainfall}mm rainfall expected on ${heavyDay.date}. Current humidity: ${c.weather.humidity}%. ${c.floodRisk.riskLevel !== 'low' ? `Combined with existing ${c.floodRisk.riskLevel} flood risk, exercise extreme caution.` : 'Monitor drainage and avoid low-lying areas.'}`,
+          countyId: c.id,
+          timestamp: new Date(now.getTime() - notifIndex * 90 * 60000),
+          read: false,
+        });
+      }
+    });
+
+  // 4. Daily national summary
+  const stats = getNationalStats();
+  notifications.push({
+    id: `notif-daily-${notifIndex++}`,
+    type: 'daily_insight',
+    severity: 'info',
+    title: 'Daily National Water Report',
+    message: `Avg. water availability: ${stats.avgWaterAvailability}% across ${stats.totalCounties} counties. ${stats.severeCount} counties under severe stress. ${stats.highFloodRisk} active flood warnings. Avg. rainfall: ${stats.avgRainfall}mm.`,
+    countyId: 'national',
+    timestamp: new Date(now.getTime() - 12 * 3600000),
+    read: true,
+  });
+
+  // 5. User-specific county notification (prioritized at top)
   if (userCountyId) {
-    const userCounty = kenyaCounties.find(c => c.id === userCountyId);
-    if (userCounty) {
+    const uc = kenyaCounties.find(c => c.id === userCountyId);
+    if (uc) {
+      const floodWarning = uc.floodRisk.riskLevel !== 'low'
+        ? ` ⚠️ Flood risk: ${uc.floodRisk.riskLevel.toUpperCase()} (${uc.floodRisk.probability}% probability). Affected: ${uc.floodRisk.affectedAreas.slice(0, 2).join(', ')}.`
+        : ' No flood warnings.';
+      const rainfallForecast = uc.weather.forecast[0]
+        ? ` Tomorrow: ${uc.weather.forecast[0].rainfall}mm ${uc.weather.forecast[0].condition.replace('_', ' ')}.`
+        : '';
+
       notifications.unshift({
-        id: 'notif-user',
+        id: 'notif-user-county',
         type: 'daily_insight',
-        severity: 'info',
-        title: `${userCounty.name} Daily Update`,
-        message: `Water availability: ${userCounty.waterAvailability}%. Stress level: ${userCounty.waterStress}. ${userCounty.floodRisk.riskLevel !== 'low' ? 'Flood risk: ' + userCounty.floodRisk.riskLevel.toUpperCase() : 'No flood warnings.'}`,
+        severity: uc.riskLevel === 'severe' ? 'warning' : 'info',
+        title: `${uc.name} County Update`,
+        message: `Water: ${uc.waterAvailability}% (stress: ${uc.waterStress}/100). 24h rainfall: ${uc.weather.rainfall24h}mm, ${uc.weather.temperature}°C, humidity ${uc.weather.humidity}%.${floodWarning}${rainfallForecast}`,
         countyId: userCountyId,
         timestamp: now,
         read: false,

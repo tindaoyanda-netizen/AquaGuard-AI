@@ -288,7 +288,7 @@ const Dashboard = () => {
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="h-[calc(100vh-10rem)] sm:h-[calc(100vh-12rem)] relative"
+            className="h-[calc(100vh-7rem)] sm:h-[calc(100vh-8rem)] relative"
           >
             <EnhancedKenyaMap
               counties={kenyaCounties}

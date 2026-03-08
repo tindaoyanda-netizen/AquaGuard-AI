@@ -169,7 +169,7 @@ const EnhancedKenyaMap = ({
   };
 
   const getRiskFillOpacity = (county: CountyData, isSelected: boolean) => {
-    return isSelected ? 0.5 : 0.25;
+    return isSelected ? 0.65 : 0.4;
   };
 
   const getFloodRiskColor = (level: string) => {
@@ -202,7 +202,7 @@ const EnhancedKenyaMap = ({
   };
 
   return (
-    <div ref={containerRef} className="relative bg-muted/30 rounded-2xl p-2 sm:p-4 h-full min-h-[400px] overflow-hidden touch-none">
+    <div ref={containerRef} className="relative bg-muted/30 rounded-2xl p-2 sm:p-4 h-full min-h-[500px] overflow-hidden touch-none">
       <svg 
         ref={svgRef}
         viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
@@ -267,18 +267,18 @@ const EnhancedKenyaMap = ({
                     fillOpacity={getRiskFillOpacity(county, isSelected)}
                     className={`cursor-pointer transition-all duration-200 ${
                       isSelected 
-                        ? 'stroke-foreground stroke-[2]' 
-                        : 'stroke-border/60 stroke-[0.5]'
+                        ? 'stroke-foreground stroke-[2.5]' 
+                        : 'stroke-foreground/40 stroke-[1]'
                     }`}
                     style={{ 
                       filter: isSelected ? 'brightness(1.2)' : undefined,
                     }}
                     onClick={() => onCountySelect(county)}
                     onMouseEnter={(e) => {
-                      (e.target as SVGPathElement).style.fillOpacity = '0.45';
+                      (e.target as SVGPathElement).style.fillOpacity = '0.6';
                     }}
                     onMouseLeave={(e) => {
-                      (e.target as SVGPathElement).style.fillOpacity = isSelected ? '0.5' : '0.25';
+                      (e.target as SVGPathElement).style.fillOpacity = isSelected ? '0.65' : '0.4';
                     }}
                   />
                 </TooltipTrigger>

@@ -141,13 +141,12 @@ const EnhancedKenyaMap = ({
   const handleZoomOut = () => setZoom(prev => Math.max(MIN_ZOOM, prev / 1.4));
   const handleReset = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
 
-  const viewBox = (() => {
-    const vw = SVG_WIDTH / zoom;
-    const vh = SVG_HEIGHT / zoom;
-    const vx = (SVG_WIDTH - vw) / 2 - pan.x / zoom;
-    const vy = (SVG_HEIGHT - vh) / 2 - pan.y / zoom;
-    return `${vx} ${vy} ${vw} ${vh}`;
-  })();
+  // Use CSS transform for zoom/pan (more reliable than viewBox manipulation)
+  const transformStyle = {
+    transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+    transformOrigin: 'center center',
+    transition: isPanning ? 'none' : 'transform 0.2s ease-out',
+  };
 
   const getSimulatedRiskLevel = (county: CountyData) => {
     const rainfallChange = (simulationRainfall - 50) / 100;

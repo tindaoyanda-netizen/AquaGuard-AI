@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Waves } from 'lucide-react';
 import heroBg from '@/assets/hero-drought.jpg';
+import RainEffect from '@/components/RainEffect';
 
 const HeroSection = () => {
   return (
@@ -15,6 +16,9 @@ const HeroSection = () => {
       
       {/* Deep Ocean Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-water-dark/90 via-secondary/80 to-water-dark/95" />
+      
+      {/* Rain */}
+      <RainEffect dropCount={70} className="z-[1]" />
       
       {/* Animated wave layers */}
       <div className="absolute bottom-0 left-0 right-0 z-10 overflow-hidden h-24">

@@ -155,7 +155,9 @@ const Dashboard = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Background rain atmosphere */}
+      <RainEffect dropCount={25} className="fixed inset-0 z-0 opacity-30" />
       {/* Header */}
       <DashboardHeader
         userLocation={userLocationDisplay}

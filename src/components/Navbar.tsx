@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Waves, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);

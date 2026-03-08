@@ -1,17 +1,41 @@
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowRight, Waves } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight, Waves, Zap, Shield, BarChart3 } from 'lucide-react';
 import heroBg from '@/assets/hero-drought.jpg';
 import RainEffect from '@/components/RainEffect';
+import { useRef } from 'react';
+
+const FloatingParticle = ({ delay, x, size }: { delay: number; x: string; size: number }) => (
+  <motion.div
+    className="absolute rounded-full bg-primary/20"
+    style={{ width: size, height: size, left: x, bottom: 0 }}
+    animate={{
+      y: [0, -600],
+      opacity: [0, 0.6, 0],
+      scale: [0.5, 1, 0.3],
+    }}
+    transition={{
+      duration: 6 + Math.random() * 4,
+      repeat: Infinity,
+      delay,
+      ease: 'easeOut',
+    }}
+  />
+);
 
 const HeroSection = () => {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
-        style={{ backgroundImage: `url(${heroBg})` }}
+    <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Parallax Background Image */}
+      <motion.div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110"
+        style={{ backgroundImage: `url(${heroBg})`, y: bgY }}
       />
       
       {/* Deep Ocean Gradient Overlay */}
@@ -33,18 +57,28 @@ const HeroSection = () => {
         </svg>
       </div>
       
-      {/* Floating water bubbles */}
-      <div className="absolute bottom-1/4 left-[20%] w-3 h-3 rounded-full bg-primary/20 animate-bubble" />
-      <div className="absolute bottom-1/3 left-[40%] w-2 h-2 rounded-full bg-accent/20 animate-bubble" style={{ animationDelay: '1s' }} />
-      <div className="absolute bottom-1/4 right-[25%] w-4 h-4 rounded-full bg-primary/15 animate-bubble" style={{ animationDelay: '2s' }} />
-      <div className="absolute bottom-1/3 right-[35%] w-2 h-2 rounded-full bg-water-teal/20 animate-bubble" style={{ animationDelay: '0.5s' }} />
+      {/* Floating particles */}
+      <FloatingParticle delay={0} x="10%" size={6} />
+      <FloatingParticle delay={1.5} x="25%" size={10} />
+      <FloatingParticle delay={0.8} x="45%" size={8} />
+      <FloatingParticle delay={2.2} x="65%" size={12} />
+      <FloatingParticle delay={3} x="80%" size={7} />
+      <FloatingParticle delay={0.5} x="90%" size={9} />
       
-      {/* Floating orbs */}
-      <div className="absolute top-1/4 left-[15%] w-72 h-72 rounded-full bg-primary/10 blur-3xl animate-float" />
-      <div className="absolute bottom-1/3 right-[10%] w-56 h-56 rounded-full bg-accent/10 blur-3xl animate-float" style={{ animationDelay: '3s' }} />
+      {/* Floating orbs with more depth */}
+      <motion.div
+        className="absolute top-1/4 left-[15%] w-72 h-72 rounded-full bg-primary/10 blur-3xl"
+        animate={{ scale: [1, 1.3, 1], x: [0, 20, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute bottom-1/3 right-[10%] w-56 h-56 rounded-full bg-accent/10 blur-3xl"
+        animate={{ scale: [1.2, 1, 1.2], y: [0, -30, 0] }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+      />
       
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <motion.div style={{ opacity }} className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -58,7 +92,9 @@ const HeroSection = () => {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-primary/15 backdrop-blur-md border border-primary/25 mb-10"
           >
-            <Waves className="w-4 h-4 text-accent" />
+            <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 4, repeat: Infinity }}>
+              <Waves className="w-4 h-4 text-accent" />
+            </motion.div>
             <span className="text-primary-foreground/90 text-sm font-medium tracking-wide">Real-Time Environmental Monitoring</span>
           </motion.div>
           
@@ -69,18 +105,29 @@ const HeroSection = () => {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary-foreground mb-6 leading-[1.1] tracking-tight"
           >
-            AquaGuard Kenya
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              AquaGuard Kenya
+            </motion.span>
             <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"
+            >
               Water & Weather Intelligence
-            </span>
+            </motion.span>
           </motion.h1>
           
           {/* Subheadline */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
+            transition={{ delay: 0.7, duration: 0.8 }}
             className="text-lg sm:text-xl text-primary-foreground/70 mb-12 max-w-2xl mx-auto leading-relaxed"
           >
             Track water availability, forecast weather, predict floods, and receive personalized alerts for your town and county.
@@ -90,7 +137,7 @@ const HeroSection = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.8 }}
+            transition={{ delay: 0.9, duration: 0.8 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <Link to="/auth">
@@ -105,13 +152,38 @@ const HeroSection = () => {
               </Button>
             </Link>
           </motion.div>
+          
+          {/* Quick stat pills */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.6 }}
+            className="flex flex-wrap justify-center gap-4 mt-16"
+          >
+            {[
+              { icon: Zap, label: 'Real-time Updates' },
+              { icon: Shield, label: '47 Counties' },
+              { icon: BarChart3, label: 'AI-Powered' },
+            ].map((item, i) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.3 + i * 0.1 }}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/5 backdrop-blur-sm border border-primary-foreground/10"
+              >
+                <item.icon className="w-3.5 h-3.5 text-accent" />
+                <span className="text-xs font-medium text-primary-foreground/70">{item.label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
         </motion.div>
         
         {/* Scroll Indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.5 }}
+          transition={{ delay: 1.5, duration: 0.5 }}
           className="absolute bottom-12 left-1/2 -translate-x-1/2"
         >
           <div className="w-6 h-10 rounded-full border-2 border-primary-foreground/25 flex items-start justify-center p-2">
@@ -122,7 +194,7 @@ const HeroSection = () => {
             />
           </div>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 };

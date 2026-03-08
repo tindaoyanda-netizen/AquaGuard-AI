@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Bell, MapPin, RefreshCw, User, LogOut, Settings, ChevronDown, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import ThemeToggle from '@/components/ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +32,7 @@ const DashboardHeader = ({
   showMenuButton,
 }: DashboardHeaderProps) => {
   return (
-    <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-sm border-b border-border">
+    <header className="sticky top-0 z-40 bg-card/95 backdrop-blur-xl border-b border-border/50">
       <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 lg:px-6">
         {/* Left: Menu + Logo & Location */}
         <div className="flex items-center gap-2 sm:gap-4">
@@ -40,34 +41,37 @@ const DashboardHeader = ({
               <Menu className="w-5 h-5" />
             </Button>
           )}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-sm">AG</span>
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0 group-hover:shadow-lg transition-shadow">
+              <span className="text-primary-foreground font-bold text-sm">AG</span>
             </div>
-            <span className="font-heading font-bold text-lg hidden sm:block">AquaGuard</span>
+            <span className="font-heading font-bold text-lg hidden sm:block text-foreground">AquaGuard</span>
           </Link>
           
           {userLocation && (
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg"
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-lg border border-border/30"
             >
               <MapPin className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium">
+              <span className="text-sm font-medium text-foreground">
                 {userLocation.town}, {userLocation.county}
               </span>
             </motion.div>
           )}
         </div>
 
-        {/* Right: Update time, Notifications, Profile */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Right: Update time, Theme, Notifications, Profile */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Last Updated */}
-          <div className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground mr-2">
             <RefreshCw className="w-3 h-3" />
             <span>Updated {lastUpdate.toLocaleTimeString()}</span>
           </div>
+          
+          {/* Theme Toggle */}
+          <ThemeToggle />
           
           {/* Notifications */}
           <Button
@@ -78,9 +82,13 @@ const DashboardHeader = ({
           >
             <Bell className="w-5 h-5" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center font-medium">
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center font-medium"
+              >
                 {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
+              </motion.span>
             )}
           </Button>
           
@@ -117,9 +125,9 @@ const DashboardHeader = ({
       
       {/* Mobile Location Bar */}
       {userLocation && (
-        <div className="lg:hidden flex items-center gap-2 px-3 sm:px-4 py-2 bg-muted/50 border-t border-border">
+        <div className="lg:hidden flex items-center gap-2 px-3 sm:px-4 py-2 bg-muted/30 border-t border-border/30">
           <MapPin className="w-4 h-4 text-primary shrink-0" />
-          <span className="text-sm truncate">
+          <span className="text-sm truncate text-foreground">
             {userLocation.town}, {userLocation.county}
           </span>
         </div>

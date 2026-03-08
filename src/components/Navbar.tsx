@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Waves, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,6 +40,7 @@ const Navbar = () => {
             >
               Dashboard
             </Link>
+            <ThemeToggle variant={isHome ? 'glass' : 'default'} />
             <Link to="/auth">
               <Button variant={isHome ? 'glass' : 'default'} size="default">
                 Get Started
@@ -84,11 +86,14 @@ const Navbar = () => {
               >
                 Dashboard
               </Link>
-              <Link to="/auth" onClick={() => setIsOpen(false)}>
-                <Button variant="default" size="lg" className="w-full">
-                  Get Started
-                </Button>
-              </Link>
+              <div className="flex items-center justify-between">
+                <ThemeToggle />
+                <Link to="/auth" onClick={() => setIsOpen(false)} className="flex-1 ml-3">
+                  <Button variant="default" size="lg" className="w-full">
+                    Get Started
+                  </Button>
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}

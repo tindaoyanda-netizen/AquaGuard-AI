@@ -360,6 +360,13 @@ const Dashboard = () => {
           onClose={() => setShowMyReports(false)}
         />
       )}
+
+      {/* Demo Report Form */}
+      <DemoReportForm
+        isOpen={showDemoForm}
+        onClose={() => setShowDemoForm(false)}
+        demoCountyId={selectedCounty?.id || 'kakamega'}
+      />
     </div>
   );
 };

@@ -135,9 +135,15 @@ const EnhancedKenyaMap = ({
   return (
     <div className="relative bg-muted/30 rounded-2xl p-2 sm:p-4 h-full min-h-[400px] overflow-hidden">
       <svg 
-        viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-        className="w-full h-full"
+        ref={svgRef}
+        viewBox={viewBox}
+        className={`w-full h-full ${isPanning ? 'cursor-grabbing' : zoom > 1 ? 'cursor-grab' : ''}`}
         preserveAspectRatio="xMidYMid meet"
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
       >
         <defs>
           <linearGradient id="lakeGradient" x1="0" y1="0" x2="0" y2="1">

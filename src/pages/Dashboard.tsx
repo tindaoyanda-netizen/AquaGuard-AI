@@ -7,6 +7,7 @@ import EnhancedKenyaMap from '@/components/dashboard/EnhancedKenyaMap';
 import RightDetailsPanel from '@/components/dashboard/RightDetailsPanel';
 import NotificationsPanel from '@/components/dashboard/NotificationsPanel';
 import ReportForm from '@/components/reporting/ReportForm';
+import DemoReportForm from '@/components/reporting/DemoReportForm';
 import ReportMarkers from '@/components/reporting/ReportMarkers';
 import AdminDashboard from '@/components/admin/AdminDashboard';
 import MyReports from '@/components/reporting/MyReports';

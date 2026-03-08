@@ -267,8 +267,8 @@ const EnhancedKenyaMap = ({
                     fillOpacity={getRiskFillOpacity(county, isSelected)}
                     className={`cursor-pointer transition-all duration-200 ${
                       isSelected 
-                        ? 'stroke-foreground stroke-[2]' 
-                        : 'stroke-border/60 stroke-[0.5]'
+                        ? 'stroke-foreground stroke-[2.5]' 
+                        : 'stroke-foreground/40 stroke-[1]'
                     }`}
                     style={{ 
                       filter: isSelected ? 'brightness(1.2)' : undefined,

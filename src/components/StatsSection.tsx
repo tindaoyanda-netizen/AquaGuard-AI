@@ -17,6 +17,9 @@ const StatsSection = () => {
       <div className="absolute top-0 left-1/4 w-64 h-64 rounded-full bg-primary/8 blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-48 h-48 rounded-full bg-accent/8 blur-3xl" />
       
+      {/* Water shimmer overlay */}
+      <div className="absolute inset-0 animate-water-shimmer pointer-events-none" />
+      
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
         <motion.div
           initial={{ opacity: 0 }}

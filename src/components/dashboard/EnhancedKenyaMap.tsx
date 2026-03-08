@@ -36,7 +36,8 @@ const EnhancedKenyaMap = ({
   simulationRainfall,
   simulationConsumption,
 }: EnhancedKenyaMapProps) => {
-  
+  const voronoiCells = useVoronoiCounties(counties);
+
   // Zoom & pan state
   const svgRef = useRef<SVGSVGElement>(null);
   const [zoom, setZoom] = useState(1);

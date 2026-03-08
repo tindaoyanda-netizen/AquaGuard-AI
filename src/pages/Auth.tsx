@@ -149,7 +149,12 @@ const Auth = () => {
         }
       }
       
-      navigate('/dashboard');
+      // After signup, go to permissions; after login, go to dashboard
+      if (isLogin) {
+        navigate('/dashboard');
+      } else {
+        navigate('/permissions');
+      }
     } catch (error) {
       console.error('Auth error:', error);
       const message = error instanceof Error ? error.message : 'Authentication failed';

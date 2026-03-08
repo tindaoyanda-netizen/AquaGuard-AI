@@ -23,8 +23,11 @@ import { kenyaCounties } from '@/data/aquaguardData';
 
 const reportSchema = z.object({
   reportType: z.enum(['flooded_road', 'dry_borehole', 'broken_kiosk', 'overflowing_river']),
-  townName: z.string().optional(),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
+  townName: z.string().trim().min(1, 'Town/area name is required').max(100),
+  subLocation: z.string().trim().max(100).optional(),
+  roadName: z.string().trim().max(150).optional(),
+  landmark: z.string().trim().max(200).optional(),
+  description: z.string().trim().max(500, 'Description must be less than 500 characters').optional(),
 });
 
 type ReportFormData = z.infer<typeof reportSchema>;

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import RainEffect from '@/components/RainEffect';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
@@ -309,6 +310,7 @@ const Dashboard = () => {
             transition={{ delay: 0.2 }}
             className="h-[calc(100vh-7rem)] sm:h-[calc(100vh-8rem)] relative"
           >
+            <RainEffect dropCount={40} className="z-10 opacity-60" />
             <EnhancedKenyaMap
               counties={kenyaCounties}
               onCountySelect={setSelectedCounty}

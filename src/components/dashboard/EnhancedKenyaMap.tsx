@@ -37,7 +37,46 @@ const EnhancedKenyaMap = ({
   simulationConsumption,
 }: EnhancedKenyaMapProps) => {
   
-  const voronoiCells = useVoronoiCounties(counties);
+  // Zoom & pan state
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+
+  const MIN_ZOOM = 1;
+  const MAX_ZOOM = 6;
+
+  const handleWheel = useCallback((e: WheelEvent<SVGSVGElement>) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setZoom(prev => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, prev * delta)));
+  }, []);
+
+  const handleMouseDown = useCallback((e: MouseEvent<SVGSVGElement>) => {
+    if (zoom <= 1) return;
+    setIsPanning(true);
+    setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+  }, [zoom, pan]);
+
+  const handleMouseMove = useCallback((e: MouseEvent<SVGSVGElement>) => {
+    if (!isPanning) return;
+    setPan({ x: e.clientX - panStart.x, y: e.clientY - panStart.y });
+  }, [isPanning, panStart]);
+
+  const handleMouseUp = useCallback(() => setIsPanning(false), []);
+
+  const handleZoomIn = () => setZoom(prev => Math.min(MAX_ZOOM, prev * 1.4));
+  const handleZoomOut = () => setZoom(prev => Math.max(MIN_ZOOM, prev / 1.4));
+  const handleReset = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
+
+  const viewBox = (() => {
+    const vw = SVG_WIDTH / zoom;
+    const vh = SVG_HEIGHT / zoom;
+    const vx = (SVG_WIDTH - vw) / 2 - pan.x / zoom;
+    const vy = (SVG_HEIGHT - vh) / 2 - pan.y / zoom;
+    return `${vx} ${vy} ${vw} ${vh}`;
+  })();
 
   const getSimulatedRiskLevel = (county: CountyData) => {
     const rainfallChange = (simulationRainfall - 50) / 100;

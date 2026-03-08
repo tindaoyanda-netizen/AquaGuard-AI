@@ -317,6 +317,16 @@ const Dashboard = () => {
                 </Button>
               </>
             )}
+            {/* Alert Thresholds */}
+            <Button
+              onClick={() => setShowAlertThresholds(true)}
+              variant="outline"
+              className="gap-2"
+              size={isMobile ? "sm" : "default"}
+            >
+              <Bell className="w-4 h-4" />
+              Alerts
+            </Button>
           </div>
           
           {/* Map Section */}

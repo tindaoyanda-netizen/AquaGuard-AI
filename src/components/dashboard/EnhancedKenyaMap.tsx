@@ -40,10 +40,13 @@ const EnhancedKenyaMap = ({
 
   // Zoom & pan state
   const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const lastTouchDist = useRef<number | null>(null);
+  const lastTouchCenter = useRef<{ x: number; y: number } | null>(null);
 
   const MIN_ZOOM = 1;
   const MAX_ZOOM = 6;
@@ -66,6 +69,73 @@ const EnhancedKenyaMap = ({
   }, [isPanning, panStart]);
 
   const handleMouseUp = useCallback(() => setIsPanning(false), []);
+
+  // Touch pinch-to-zoom and pan
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const getTouchDist = (t: TouchList) => {
+      const dx = t[0].clientX - t[1].clientX;
+      const dy = t[0].clientY - t[1].clientY;
+      return Math.hypot(dx, dy);
+    };
+
+    const getTouchCenter = (t: TouchList) => ({
+      x: (t[0].clientX + t[1].clientX) / 2,
+      y: (t[0].clientY + t[1].clientY) / 2,
+    });
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        lastTouchDist.current = getTouchDist(e.touches);
+        lastTouchCenter.current = getTouchCenter(e.touches);
+      } else if (e.touches.length === 1) {
+        // Single finger pan when zoomed
+        setIsPanning(true);
+        setPanStart({ x: e.touches[0].clientX - pan.x, y: e.touches[0].clientY - pan.y });
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && lastTouchDist.current !== null) {
+        e.preventDefault();
+        const newDist = getTouchDist(e.touches);
+        const scale = newDist / lastTouchDist.current;
+        setZoom(prev => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, prev * scale)));
+        lastTouchDist.current = newDist;
+
+        // Pan with two fingers
+        const center = getTouchCenter(e.touches);
+        if (lastTouchCenter.current) {
+          setPan(prev => ({
+            x: prev.x + (center.x - lastTouchCenter.current!.x),
+            y: prev.y + (center.y - lastTouchCenter.current!.y),
+          }));
+        }
+        lastTouchCenter.current = center;
+      } else if (e.touches.length === 1 && isPanning) {
+        setPan({ x: e.touches[0].clientX - panStart.x, y: e.touches[0].clientY - panStart.y });
+      }
+    };
+
+    const onTouchEnd = () => {
+      lastTouchDist.current = null;
+      lastTouchCenter.current = null;
+      setIsPanning(false);
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: false });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [pan, isPanning, panStart]);
 
   const handleZoomIn = () => setZoom(prev => Math.min(MAX_ZOOM, prev * 1.4));
   const handleZoomOut = () => setZoom(prev => Math.max(MIN_ZOOM, prev / 1.4));

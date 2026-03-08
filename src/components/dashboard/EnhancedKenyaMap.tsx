@@ -526,9 +526,59 @@ const EnhancedKenyaMap = ({
         )}
       </div>
       
-      {/* Instructions */}
-      <div className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-card/90 backdrop-blur-sm rounded-lg px-2 sm:px-3 py-1.5 border border-border">
-        <p className="text-[10px] sm:text-xs text-muted-foreground">Click a county for details</p>
+      {/* County Search */}
+      <div ref={searchRef} className="absolute top-2 sm:top-4 left-2 sm:left-4 z-20">
+        {showSearch ? (
+          <div className="bg-card/95 backdrop-blur-sm rounded-lg border border-border shadow-lg w-56 sm:w-64">
+            <div className="flex items-center gap-2 p-2 border-b border-border">
+              <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+              <Input
+                autoFocus
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search county..."
+                className="h-7 text-xs border-0 bg-transparent p-0 focus-visible:ring-0"
+              />
+              <button onClick={() => { setShowSearch(false); setSearchQuery(''); }} className="p-0.5 hover:bg-muted rounded">
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </div>
+            {searchQuery.trim() && (
+              <div className="max-h-48 overflow-y-auto p-1">
+                {filteredCounties.length === 0 ? (
+                  <p className="text-xs text-muted-foreground p-2">No counties found</p>
+                ) : (
+                  filteredCounties.map(county => (
+                    <button
+                      key={county.id}
+                      onClick={() => zoomToCounty(county)}
+                      className="w-full text-left px-3 py-2 text-xs rounded-md hover:bg-muted transition-colors flex items-center justify-between"
+                    >
+                      <span className="font-medium">{county.name}</span>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                        county.waterStress <= 40 ? 'bg-success/20 text-success' :
+                        county.waterStress <= 70 ? 'bg-warning/20 text-warning' :
+                        'bg-destructive/20 text-destructive'
+                      }`}>
+                        {county.waterAvailability}%
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 gap-1.5 bg-card/90 backdrop-blur-sm border-border text-xs"
+            onClick={() => setShowSearch(true)}
+          >
+            <Search className="w-3 h-3" />
+            Search county
+          </Button>
+        )}
       </div>
       
       {/* Water Source Legend */}

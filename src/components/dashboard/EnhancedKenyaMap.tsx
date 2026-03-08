@@ -169,7 +169,7 @@ const EnhancedKenyaMap = ({
   };
 
   const getRiskFillOpacity = (county: CountyData, isSelected: boolean) => {
-    return isSelected ? 0.5 : 0.25;
+    return isSelected ? 0.65 : 0.4;
   };
 
   const getFloodRiskColor = (level: string) => {

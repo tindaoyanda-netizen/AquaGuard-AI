@@ -215,6 +215,49 @@
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
+
+  /* Water animations */
+  .animate-wave {
+    animation: wave 8s linear infinite;
+  }
+
+  .animate-wave-reverse {
+    animation: wave-reverse 10s linear infinite;
+  }
+
+  .animate-droplet {
+    animation: droplet 2.5s ease-in infinite;
+  }
+
+  .animate-bubble {
+    animation: bubble-rise 3s ease-out infinite;
+  }
+
+  .animate-water-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--primary) / 0.08) 25%,
+      hsl(var(--primary) / 0.15) 50%,
+      hsl(var(--primary) / 0.08) 75%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: water-shimmer 4s ease-in-out infinite;
+  }
+
+  .animate-tide {
+    animation: tide-in-out 6s ease-in-out infinite;
+  }
+
+  .animate-splash {
+    animation: splash 1.5s ease-out infinite;
+  }
+
+  .animate-current {
+    stroke-dasharray: 20 20;
+    animation: current-flow 1.5s linear infinite;
+  }
 }
 
 @keyframes fadeUp {

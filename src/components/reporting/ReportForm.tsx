@@ -86,6 +86,55 @@ const ReportForm = ({ isOpen, onClose, userLocation, userCountyId, onReportSubmi
     }
   };
 
+  const openCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+      setCameraStream(stream);
+      setIsCameraOpen(true);
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play();
+        }
+      }, 100);
+    } catch {
+      toast({
+        title: 'Camera unavailable',
+        description: 'Please grant camera permission or upload an image instead.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0);
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const file = new File([blob], `capture-${Date.now()}.jpg`, { type: 'image/jpeg' });
+        setImageFile(file);
+        setImagePreview(canvas.toDataURL('image/jpeg'));
+        closeCamera();
+      }
+    }, 'image/jpeg', 0.85);
+  };
+
+  const closeCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(t => t.stop());
+      setCameraStream(null);
+    }
+    setIsCameraOpen(false);
+  };
+
   const onSubmit = async (data: ReportFormData) => {
     if (!userLocation || !userCountyId) {
       toast({

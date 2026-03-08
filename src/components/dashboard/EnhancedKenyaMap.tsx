@@ -275,10 +275,10 @@ const EnhancedKenyaMap = ({
                     }}
                     onClick={() => onCountySelect(county)}
                     onMouseEnter={(e) => {
-                      (e.target as SVGPathElement).style.fillOpacity = '0.45';
+                      (e.target as SVGPathElement).style.fillOpacity = '0.6';
                     }}
                     onMouseLeave={(e) => {
-                      (e.target as SVGPathElement).style.fillOpacity = isSelected ? '0.5' : '0.25';
+                      (e.target as SVGPathElement).style.fillOpacity = isSelected ? '0.65' : '0.4';
                     }}
                   />
                 </TooltipTrigger>

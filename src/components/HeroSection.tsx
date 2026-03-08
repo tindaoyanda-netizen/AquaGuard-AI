@@ -16,8 +16,24 @@ const HeroSection = () => {
       {/* Deep Ocean Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-water-dark/90 via-secondary/80 to-water-dark/95" />
       
-      {/* Subtle animated waves */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-10" />
+      {/* Animated wave layers */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 overflow-hidden h-24">
+        <svg className="absolute bottom-0 w-[200%] h-full animate-wave" viewBox="0 0 1440 60" preserveAspectRatio="none">
+          <path d="M0,30 C360,60 720,0 1080,30 C1260,45 1380,15 1440,30 L1440,60 L0,60 Z" fill="hsl(var(--background))" fillOpacity="0.6" />
+        </svg>
+        <svg className="absolute bottom-0 w-[200%] h-full animate-wave-reverse" viewBox="0 0 1440 60" preserveAspectRatio="none">
+          <path d="M0,40 C240,10 480,50 720,30 C960,10 1200,50 1440,30 L1440,60 L0,60 Z" fill="hsl(var(--background))" fillOpacity="0.8" />
+        </svg>
+        <svg className="absolute bottom-0 w-[200%] h-full animate-wave" style={{ animationDelay: '-3s', animationDuration: '12s' }} viewBox="0 0 1440 60" preserveAspectRatio="none">
+          <path d="M0,25 C180,50 540,10 900,35 C1080,45 1260,20 1440,35 L1440,60 L0,60 Z" fill="hsl(var(--background))" />
+        </svg>
+      </div>
+      
+      {/* Floating water bubbles */}
+      <div className="absolute bottom-1/4 left-[20%] w-3 h-3 rounded-full bg-primary/20 animate-bubble" />
+      <div className="absolute bottom-1/3 left-[40%] w-2 h-2 rounded-full bg-accent/20 animate-bubble" style={{ animationDelay: '1s' }} />
+      <div className="absolute bottom-1/4 right-[25%] w-4 h-4 rounded-full bg-primary/15 animate-bubble" style={{ animationDelay: '2s' }} />
+      <div className="absolute bottom-1/3 right-[35%] w-2 h-2 rounded-full bg-water-teal/20 animate-bubble" style={{ animationDelay: '0.5s' }} />
       
       {/* Floating orbs */}
       <div className="absolute top-1/4 left-[15%] w-72 h-72 rounded-full bg-primary/10 blur-3xl animate-float" />

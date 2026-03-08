@@ -37,6 +37,10 @@ const FeaturesSection = () => {
         backgroundSize: '60px 60px'
       }} />
       
+      {/* Water ripple accents */}
+      <div className="absolute top-20 right-10 w-32 h-32 rounded-full border border-primary/10 animate-splash" />
+      <div className="absolute bottom-32 left-16 w-24 h-24 rounded-full border border-water-teal/10 animate-splash" style={{ animationDelay: '0.7s' }} />
+      
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Section Header */}
         <motion.div

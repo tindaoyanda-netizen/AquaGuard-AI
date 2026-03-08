@@ -456,6 +456,21 @@ const EnhancedKenyaMap = ({
           </div>
         </div>
       </div>
+      
+      {/* Zoom Controls */}
+      <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 flex flex-col gap-1">
+        <Button variant="outline" size="icon" className="h-7 w-7 bg-card/90 backdrop-blur-sm border-border" onClick={handleZoomIn}>
+          <ZoomIn className="h-3.5 w-3.5" />
+        </Button>
+        <Button variant="outline" size="icon" className="h-7 w-7 bg-card/90 backdrop-blur-sm border-border" onClick={handleZoomOut}>
+          <ZoomOut className="h-3.5 w-3.5" />
+        </Button>
+        {zoom > 1 && (
+          <Button variant="outline" size="icon" className="h-7 w-7 bg-card/90 backdrop-blur-sm border-border" onClick={handleReset}>
+            <RotateCcw className="h-3.5 w-3.5" />
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

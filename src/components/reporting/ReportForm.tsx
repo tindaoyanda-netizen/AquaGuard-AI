@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,7 +11,8 @@ import {
   Upload, 
   Loader2,
   CheckCircle2,
-  Info
+  Info,
+  Camera
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,6 +54,10 @@ const ReportForm = ({ isOpen, onClose, userLocation, userCountyId, onReportSubmi
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [aiAnalysis, setAiAnalysis] = useState<{ score: number; analysis: string } | null>(null);
   const [step, setStep] = useState<'form' | 'analyzing' | 'success'>('form');
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
   const { register, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm<ReportFormData>({
@@ -79,6 +84,55 @@ const ReportForm = ({ isOpen, onClose, userLocation, userCountyId, onReportSubmi
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const openCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+      setCameraStream(stream);
+      setIsCameraOpen(true);
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play();
+        }
+      }, 100);
+    } catch {
+      toast({
+        title: 'Camera unavailable',
+        description: 'Please grant camera permission or upload an image instead.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0);
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const file = new File([blob], `capture-${Date.now()}.jpg`, { type: 'image/jpeg' });
+        setImageFile(file);
+        setImagePreview(canvas.toDataURL('image/jpeg'));
+        closeCamera();
+      }
+    }, 'image/jpeg', 0.85);
+  };
+
+  const closeCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(t => t.stop());
+      setCameraStream(null);
+    }
+    setIsCameraOpen(false);
   };
 
   const onSubmit = async (data: ReportFormData) => {
@@ -193,6 +247,7 @@ const ReportForm = ({ isOpen, onClose, userLocation, userCountyId, onReportSubmi
   };
 
   const handleClose = () => {
+    closeCamera();
     reset();
     setImageFile(null);
     setImagePreview(null);
@@ -338,42 +393,54 @@ const ReportForm = ({ isOpen, onClose, userLocation, userCountyId, onReportSubmi
                     )}
                   </div>
 
-                  {/* Image Upload */}
+                  {/* Image Upload / Camera Capture */}
                   <div className="space-y-2">
                     <Label>Photo Evidence (Optional)</Label>
-                    <div className="relative">
-                      {imagePreview ? (
-                        <div className="relative rounded-xl overflow-hidden">
-                          <img
-                            src={imagePreview}
-                            alt="Preview"
-                            className="w-full h-40 object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setImageFile(null);
-                              setImagePreview(null);
-                            }}
-                            className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-lg hover:bg-black/70"
-                          >
-                            <X className="w-4 h-4 text-white" />
-                          </button>
+                    <canvas ref={canvasRef} className="hidden" />
+                    
+                    {isCameraOpen ? (
+                      <div className="relative rounded-xl overflow-hidden bg-black">
+                        <video ref={videoRef} autoPlay playsInline muted className="w-full h-48 object-cover" />
+                        <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-3">
+                          <Button type="button" size="sm" variant="destructive" onClick={closeCamera} className="rounded-full">
+                            <X className="w-4 h-4 mr-1" /> Cancel
+                          </Button>
+                          <Button type="button" size="lg" onClick={capturePhoto} className="rounded-full w-14 h-14 bg-white hover:bg-white/90 border-4 border-primary p-0">
+                            <div className="w-10 h-10 rounded-full bg-primary" />
+                          </Button>
                         </div>
-                      ) : (
-                        <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors">
-                          <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                          <span className="text-sm text-muted-foreground">Click to upload image</span>
-                          <span className="text-xs text-muted-foreground">Max 5MB</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                          />
+                      </div>
+                    ) : imagePreview ? (
+                      <div className="relative rounded-xl overflow-hidden">
+                        <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => { setImageFile(null); setImagePreview(null); }}
+                          className="absolute top-2 right-2 p-1.5 bg-black/50 rounded-lg hover:bg-black/70"
+                        >
+                          <X className="w-4 h-4 text-white" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex flex-col items-center justify-center h-28 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-muted/50"
+                          onClick={openCamera}
+                        >
+                          <Camera className="w-7 h-7 text-primary mb-1.5" />
+                          <span className="text-xs font-medium text-foreground">Capture Live</span>
+                          <span className="text-[10px] text-muted-foreground">Use camera</span>
+                        </Button>
+                        <label className="flex flex-col items-center justify-center h-28 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors">
+                          <Upload className="w-7 h-7 text-muted-foreground mb-1.5" />
+                          <span className="text-xs font-medium text-foreground">Upload Photo</span>
+                          <span className="text-[10px] text-muted-foreground">Max 5MB</span>
+                          <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                         </label>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* AI Notice */}

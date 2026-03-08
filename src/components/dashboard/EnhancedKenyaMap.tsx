@@ -1,6 +1,9 @@
+import { useRef, useState, useCallback, WheelEvent, MouseEvent } from 'react';
 import { CountyData, WaterSource, waterSources } from '@/data/aquaguardData';
 import { motion } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   projectToSvg,
   KENYA_OUTLINE_PATH,
@@ -33,8 +36,48 @@ const EnhancedKenyaMap = ({
   simulationRainfall,
   simulationConsumption,
 }: EnhancedKenyaMapProps) => {
-  
   const voronoiCells = useVoronoiCounties(counties);
+
+  // Zoom & pan state
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+
+  const MIN_ZOOM = 1;
+  const MAX_ZOOM = 6;
+
+  const handleWheel = useCallback((e: WheelEvent<SVGSVGElement>) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setZoom(prev => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, prev * delta)));
+  }, []);
+
+  const handleMouseDown = useCallback((e: MouseEvent<SVGSVGElement>) => {
+    if (zoom <= 1) return;
+    setIsPanning(true);
+    setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+  }, [zoom, pan]);
+
+  const handleMouseMove = useCallback((e: MouseEvent<SVGSVGElement>) => {
+    if (!isPanning) return;
+    setPan({ x: e.clientX - panStart.x, y: e.clientY - panStart.y });
+  }, [isPanning, panStart]);
+
+  const handleMouseUp = useCallback(() => setIsPanning(false), []);
+
+  const handleZoomIn = () => setZoom(prev => Math.min(MAX_ZOOM, prev * 1.4));
+  const handleZoomOut = () => setZoom(prev => Math.max(MIN_ZOOM, prev / 1.4));
+  const handleReset = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
+
+  const viewBox = (() => {
+    const vw = SVG_WIDTH / zoom;
+    const vh = SVG_HEIGHT / zoom;
+    const vx = (SVG_WIDTH - vw) / 2 - pan.x / zoom;
+    const vy = (SVG_HEIGHT - vh) / 2 - pan.y / zoom;
+    return `${vx} ${vy} ${vw} ${vh}`;
+  })();
 
   const getSimulatedRiskLevel = (county: CountyData) => {
     const rainfallChange = (simulationRainfall - 50) / 100;
@@ -92,9 +135,15 @@ const EnhancedKenyaMap = ({
   return (
     <div className="relative bg-muted/30 rounded-2xl p-2 sm:p-4 h-full min-h-[400px] overflow-hidden">
       <svg 
-        viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-        className="w-full h-full"
+        ref={svgRef}
+        viewBox={viewBox}
+        className={`w-full h-full ${isPanning ? 'cursor-grabbing' : zoom > 1 ? 'cursor-grab' : ''}`}
         preserveAspectRatio="xMidYMid meet"
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
       >
         <defs>
           <linearGradient id="lakeGradient" x1="0" y1="0" x2="0" y2="1">
@@ -406,6 +455,21 @@ const EnhancedKenyaMap = ({
             <span className="text-[10px] text-muted-foreground">Critical</span>
           </div>
         </div>
+      </div>
+      
+      {/* Zoom Controls */}
+      <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 flex flex-col gap-1">
+        <Button variant="outline" size="icon" className="h-7 w-7 bg-card/90 backdrop-blur-sm border-border" onClick={handleZoomIn}>
+          <ZoomIn className="h-3.5 w-3.5" />
+        </Button>
+        <Button variant="outline" size="icon" className="h-7 w-7 bg-card/90 backdrop-blur-sm border-border" onClick={handleZoomOut}>
+          <ZoomOut className="h-3.5 w-3.5" />
+        </Button>
+        {zoom > 1 && (
+          <Button variant="outline" size="icon" className="h-7 w-7 bg-card/90 backdrop-blur-sm border-border" onClick={handleReset}>
+            <RotateCcw className="h-3.5 w-3.5" />
+          </Button>
+        )}
       </div>
     </div>
   );

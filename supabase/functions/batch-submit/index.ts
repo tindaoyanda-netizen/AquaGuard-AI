@@ -92,11 +92,43 @@ serve(async (req) => {
       result = { inserted: data?.length ?? 0, ids: data?.map(r => r.id) };
 
     } else if (type === 'metrics') {
+      // Verify caller is a county_admin
+      const { data: roleRow } = await supabaseAuth
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (roleRow?.role !== 'county_admin') {
+        return new Response(JSON.stringify({ error: 'Forbidden: county admin role required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Get admin's county
+      const { data: profileRow } = await supabaseAuth
+        .from('profiles')
+        .select('county_id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const adminCounty = profileRow?.county_id;
+
       const metrics = (items as BatchMetric[]).map(item => ({
         ...item,
+        county_id: adminCounty || item.county_id, // enforce admin's county
         source: item.source || 'iot_sensor',
         recorded_at: item.recorded_at || new Date().toISOString(),
       }));
+
+      // Verify all metrics are for admin's county
+      if (adminCounty && metrics.some(m => m.county_id !== adminCounty)) {
+        return new Response(JSON.stringify({ error: 'Can only submit metrics for your own county' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
 
       const { data, error } = await adminClient
         .from('water_metrics_history')

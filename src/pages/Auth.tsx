@@ -520,9 +520,7 @@ const Auth = () => {
             {isLogin ? (
               '🔒 Your data is encrypted and secure'
             ) : (
-              formData.role === 'county_admin'
-                ? '🛡️ County Admins can verify community reports in their assigned county'
-                : '📍 Residents can submit environmental reports for their community'
+              '📍 Residents can submit environmental reports for their community'
             )}
           </motion.p>
         </motion.div>

@@ -15,7 +15,7 @@ const authSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['resident', 'county_admin']),
+  role: z.enum(['resident']),
   countyId: z.string().min(1, 'Please select a county'),
 });
 
@@ -144,7 +144,7 @@ const Auth = () => {
         await signIn(formData.email, formData.password);
         toast({ title: 'Welcome back!', description: 'You have successfully signed in' });
       } else {
-        await signUp(formData.email, formData.password, formData.name, formData.countyId, formData.role);
+        await signUp(formData.email, formData.password, formData.name, formData.countyId, 'resident');
         toast({ title: 'Account created!', description: 'Please check your email to verify your account' });
       }
       if (formData.countyId) {
@@ -176,7 +176,6 @@ const Auth = () => {
 
   const roles = [
     { id: 'resident', label: 'Resident', icon: Users, description: 'Submit environmental reports' },
-    { id: 'county_admin', label: 'County Admin', icon: Shield, description: 'Verify reports in your county' },
   ] as const;
 
   // Stagger animation variants
@@ -521,9 +520,7 @@ const Auth = () => {
             {isLogin ? (
               '🔒 Your data is encrypted and secure'
             ) : (
-              formData.role === 'county_admin'
-                ? '🛡️ County Admins can verify community reports in their assigned county'
-                : '📍 Residents can submit environmental reports for their community'
+              '📍 Residents can submit environmental reports for their community'
             )}
           </motion.p>
         </motion.div>

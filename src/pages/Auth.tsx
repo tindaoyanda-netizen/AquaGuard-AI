@@ -176,7 +176,6 @@ const Auth = () => {
 
   const roles = [
     { id: 'resident', label: 'Resident', icon: Users, description: 'Submit environmental reports' },
-    { id: 'county_admin', label: 'County Admin', icon: Shield, description: 'Verify reports in your county' },
   ] as const;
 
   // Stagger animation variants

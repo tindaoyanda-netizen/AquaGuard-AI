@@ -209,6 +209,7 @@ const ReportForm = ({ isOpen, onClose, userLocation, userCountyId, onReportSubmi
           latitude: userLocation.lat,
           longitude: userLocation.lng,
           description: data.description,
+          imageUrl: imageUrl,
           weatherData: weatherData ? {
             temperature: weatherData.temperature,
             humidity: weatherData.humidity,

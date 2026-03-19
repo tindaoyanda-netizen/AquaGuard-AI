@@ -2,3 +2,12 @@ project_id = "djbmhbmwtmjsbmavsvjy"
 
 [functions.analyze-report]
 verify_jwt = false
+
+[functions.predict-flood]
+verify_jwt = false
+
+[functions.water-stress-index]
+verify_jwt = false
+
+[functions.daily-summary]
+verify_jwt = false

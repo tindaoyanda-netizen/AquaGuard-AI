@@ -190,6 +190,8 @@ export function useAuth() {
     signIn,
     signOut,
     isCountyAdmin: state.role === 'county_admin',
+    isSubAdmin: state.role === 'sub_admin',
+    isAdmin: state.role === 'county_admin' || state.role === 'sub_admin',
     isResident: state.role === 'resident',
   };
 }

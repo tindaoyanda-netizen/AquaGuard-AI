@@ -64,6 +64,7 @@ const Dashboard = () => {
   const [showMyReports, setShowMyReports] = useState(false);
   const [showDemoForm, setShowDemoForm] = useState(false);
   const [showAlertThresholds, setShowAlertThresholds] = useState(false);
+  const [showTeamManagement, setShowTeamManagement] = useState(false);
   const [dashboardReady, setDashboardReady] = useState(false);
   const nationalStats = getNationalStats();
 

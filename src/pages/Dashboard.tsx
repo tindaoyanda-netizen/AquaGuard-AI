@@ -156,7 +156,7 @@ const Dashboard = () => {
 
   useRealtimeReports({
     countyId: userCountyId,
-    isCountyAdmin,
+    isCountyAdmin: isAdmin,
     onNewReport: handleReportSubmitted,
   });
 

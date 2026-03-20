@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_invitations: {
+        Row: {
+          accepted_at: string | null
+          county_id: string
+          created_at: string
+          email: string
+          id: string
+          invited_by: string
+          role: Database["public"]["Enums"]["app_role"]
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          county_id: string
+          created_at?: string
+          email: string
+          id?: string
+          invited_by: string
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          county_id?: string
+          created_at?: string
+          email?: string
+          id?: string
+          invited_by?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: string
+        }
+        Relationships: []
+      }
       api_logs: {
         Row: {
           created_at: string
@@ -260,6 +293,48 @@ export type Database = {
           },
         ]
       }
+      sub_admin_permissions: {
+        Row: {
+          can_export_data: boolean
+          can_manage_alerts: boolean
+          can_reply_reports: boolean
+          can_verify_reports: boolean
+          can_view_analytics: boolean
+          county_id: string
+          created_at: string
+          granted_by: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          can_export_data?: boolean
+          can_manage_alerts?: boolean
+          can_reply_reports?: boolean
+          can_verify_reports?: boolean
+          can_view_analytics?: boolean
+          county_id: string
+          created_at?: string
+          granted_by: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          can_export_data?: boolean
+          can_manage_alerts?: boolean
+          can_reply_reports?: boolean
+          can_verify_reports?: boolean
+          can_view_analytics?: boolean
+          county_id?: string
+          created_at?: string
+          granted_by?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -353,7 +428,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "resident" | "county_admin"
+      app_role: "resident" | "county_admin" | "sub_admin"
       report_status: "pending" | "verified" | "rejected"
       report_type:
         | "flooded_road"
@@ -487,7 +562,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["resident", "county_admin"],
+      app_role: ["resident", "county_admin", "sub_admin"],
       report_status: ["pending", "verified", "rejected"],
       report_type: [
         "flooded_road",

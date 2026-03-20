@@ -12,10 +12,11 @@ import ReportForm from '@/components/reporting/ReportForm';
 import DemoReportForm from '@/components/reporting/DemoReportForm';
 import ReportMarkers from '@/components/reporting/ReportMarkers';
 import AdminDashboard from '@/components/admin/AdminDashboard';
+import TeamManagement from '@/components/admin/TeamManagement';
 import MyReports from '@/components/reporting/MyReports';
 import AlertThresholds from '@/components/dashboard/AlertThresholds';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Shield, Plus, FileText, Menu, Beaker, Bell } from 'lucide-react';
+import { AlertTriangle, Shield, Plus, FileText, Menu, Beaker, Bell, Users } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeReports } from '@/hooks/useRealtimeReports';
 import { useResidentNotifications } from '@/hooks/useResidentNotifications';
@@ -33,7 +34,7 @@ import {
 const Dashboard = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { user, profile, role, isLoading: authLoading, isCountyAdmin } = useAuth();
+  const { user, profile, role, isLoading: authLoading, isCountyAdmin, isSubAdmin, isAdmin } = useAuth();
   
   const [selectedCounty, setSelectedCounty] = useState<CountyData | null>(null);
   const [timeRange, setTimeRange] = useState<'7' | '30' | '90'>('30');
@@ -63,6 +64,7 @@ const Dashboard = () => {
   const [showMyReports, setShowMyReports] = useState(false);
   const [showDemoForm, setShowDemoForm] = useState(false);
   const [showAlertThresholds, setShowAlertThresholds] = useState(false);
+  const [showTeamManagement, setShowTeamManagement] = useState(false);
   const [dashboardReady, setDashboardReady] = useState(false);
   const nationalStats = getNationalStats();
 
@@ -154,14 +156,14 @@ const Dashboard = () => {
 
   useRealtimeReports({
     countyId: userCountyId,
-    isCountyAdmin,
+    isCountyAdmin: isAdmin,
     onNewReport: handleReportSubmitted,
   });
 
   // Resident notifications for admin replies and status changes
   const { unreadCount: residentUnread } = useResidentNotifications({
     userId: user?.id || null,
-    enabled: !!user && !isCountyAdmin,
+    enabled: !!user && !isAdmin,
   });
 
   if (!dashboardReady) {
@@ -271,7 +273,7 @@ const Dashboard = () => {
               </Button>
             )}
             
-            {user && !isCountyAdmin && (
+            {user && !isAdmin && (
               <Button
                 onClick={() => setShowMyReports(true)}
                 variant="outline"
@@ -283,7 +285,7 @@ const Dashboard = () => {
               </Button>
             )}
             
-            {isCountyAdmin && (
+            {isAdmin && (
               <Button
                 onClick={() => setShowAdminDashboard(true)}
                 variant="outline"
@@ -292,6 +294,18 @@ const Dashboard = () => {
               >
                 <Shield className="w-4 h-4" />
                 Admin Dashboard
+              </Button>
+            )}
+
+            {isCountyAdmin && (
+              <Button
+                onClick={() => setShowTeamManagement(true)}
+                variant="outline"
+                className="gap-2"
+                size={isMobile ? "sm" : "default"}
+              >
+                <Users className="w-4 h-4" />
+                Team
               </Button>
             )}
             
@@ -380,11 +394,20 @@ const Dashboard = () => {
       />
       
       {/* Admin Dashboard */}
-      {isCountyAdmin && userCountyId && (
+      {isAdmin && userCountyId && (
         <AdminDashboard
           isOpen={showAdminDashboard}
           onClose={() => setShowAdminDashboard(false)}
           userCountyId={userCountyId}
+        />
+      )}
+
+      {/* Team Management (county_admin only) */}
+      {isCountyAdmin && userCountyId && (
+        <TeamManagement
+          isOpen={showTeamManagement}
+          onClose={() => setShowTeamManagement(false)}
+          countyId={userCountyId}
         />
       )}
       

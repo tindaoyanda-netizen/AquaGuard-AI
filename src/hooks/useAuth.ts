@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
-export type UserRole = 'resident' | 'county_admin';
+export type UserRole = 'resident' | 'county_admin' | 'sub_admin';
 
 export interface UserProfile {
   id: string;
@@ -190,6 +190,8 @@ export function useAuth() {
     signIn,
     signOut,
     isCountyAdmin: state.role === 'county_admin',
+    isSubAdmin: state.role === 'sub_admin',
+    isAdmin: state.role === 'county_admin' || state.role === 'sub_admin',
     isResident: state.role === 'resident',
   };
 }

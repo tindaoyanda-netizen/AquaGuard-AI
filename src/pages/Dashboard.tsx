@@ -394,11 +394,20 @@ const Dashboard = () => {
       />
       
       {/* Admin Dashboard */}
-      {isCountyAdmin && userCountyId && (
+      {isAdmin && userCountyId && (
         <AdminDashboard
           isOpen={showAdminDashboard}
           onClose={() => setShowAdminDashboard(false)}
           userCountyId={userCountyId}
+        />
+      )}
+
+      {/* Team Management (county_admin only) */}
+      {isCountyAdmin && userCountyId && (
+        <TeamManagement
+          isOpen={showTeamManagement}
+          onClose={() => setShowTeamManagement(false)}
+          countyId={userCountyId}
         />
       )}
       

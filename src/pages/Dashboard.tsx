@@ -34,7 +34,7 @@ import {
 const Dashboard = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { user, profile, role, isLoading: authLoading, isCountyAdmin } = useAuth();
+  const { user, profile, role, isLoading: authLoading, isCountyAdmin, isSubAdmin, isAdmin } = useAuth();
   
   const [selectedCounty, setSelectedCounty] = useState<CountyData | null>(null);
   const [timeRange, setTimeRange] = useState<'7' | '30' | '90'>('30');

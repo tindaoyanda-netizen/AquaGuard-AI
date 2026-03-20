@@ -273,7 +273,7 @@ const Dashboard = () => {
               </Button>
             )}
             
-            {user && !isCountyAdmin && (
+            {user && !isAdmin && (
               <Button
                 onClick={() => setShowMyReports(true)}
                 variant="outline"
@@ -285,7 +285,7 @@ const Dashboard = () => {
               </Button>
             )}
             
-            {isCountyAdmin && (
+            {isAdmin && (
               <Button
                 onClick={() => setShowAdminDashboard(true)}
                 variant="outline"
@@ -294,6 +294,18 @@ const Dashboard = () => {
               >
                 <Shield className="w-4 h-4" />
                 Admin Dashboard
+              </Button>
+            )}
+
+            {isCountyAdmin && (
+              <Button
+                onClick={() => setShowTeamManagement(true)}
+                variant="outline"
+                className="gap-2"
+                size={isMobile ? "sm" : "default"}
+              >
+                <Users className="w-4 h-4" />
+                Team
               </Button>
             )}
             

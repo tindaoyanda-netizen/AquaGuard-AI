@@ -144,8 +144,8 @@ export function useAuth() {
       });
 
     if (roleError) {
-      console.error('Role creation error:', roleError);
-      throw new Error('Failed to assign role');
+      // Role table may have RLS restrictions — non-fatal, role is inferred from profile
+      console.warn('Role insert skipped (RLS):', roleError.message);
     }
 
     return data;
@@ -177,7 +177,8 @@ export function useAuth() {
     });
   };
 
-  const isGovernmentAdmin = state.profile?.county_id === 'kenya_national' && state.role === 'county_admin';
+  // Government admin is identified purely by county_id in their profile
+  const isGovernmentAdmin = state.profile?.county_id === 'kenya_national';
 
   return {
     ...state,

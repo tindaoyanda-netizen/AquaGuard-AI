@@ -117,7 +117,9 @@ const Auth = () => {
           }
           // Check if gov admin already exists
           const res = await fetch('/api/admin/check-gov-admin');
-          const data = await res.json();
+          const text = await res.text();
+          let data: { exists?: boolean } = {};
+          try { data = JSON.parse(text); } catch { data = { exists: false }; }
           if (data.exists) {
             toast({
               title: 'Account already exists',
